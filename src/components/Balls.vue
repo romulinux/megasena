@@ -58,6 +58,7 @@
             {{ ball.val }}
           </div>
           <div class="hits">{{ game.hits }}</div>
+          <input type="button" value="-" class="remove" v-on:click=remove(game) />
         </div>
       </div>
     </div>
@@ -114,15 +115,18 @@ export default {
           key: this.games.length,
           balls: this.chosen.balls.sort((l, r) => l.val < r.val),
           hits: this.chosen.balls.reduce((r, b) => b.awarded ? r + 1 : r , 0)
-        }
-        )
+        })
         this.balls.filter(f => { f.chosen = false })
         this.chosen.balls = []
+        this.chosen.left = this.chosen.amount - this.chosen.balls.length
       } else if (this.chosen.amount > this.chosen.balls.length) {
         return alert(`Please choose more '${this.chosen.amount - this.chosen.balls.length}' ball(s)`)
       } else if (this.chosen.amount < this.chosen.balls.length) {
         return alert(`The number of chosen balls is too high! Please, remove '${this.chosen.balls.length - this.chosen.amount}' ball(s).`)
       }
+    },
+    remove (game){
+      this.games = this.games.filter(g => g.key !== game.key)
     },
     verify() {
       this.balls.filter(b => b.awarded = false)
@@ -207,6 +211,23 @@ export default {
     color: white;
     background: blue;
     border: solid 1px black;
+  }
+
+  .remove {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    padding: 2px;
+    margin: 2px;
+    font-weight: bold;
+    color: white;
+    background: red;
+    border: solid 1px darkred;
   }
 
   .ball {
