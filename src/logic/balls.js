@@ -6,8 +6,8 @@ export function balls (amount = 60) {
     balls.push({
       key: i,
       val: (i + 1).toString().padStart(2, '0'),
-      sorted: false,
-      choiced: false
+      awarded: false,
+      chosen: false
     })
   }
   return balls

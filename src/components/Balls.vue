@@ -8,9 +8,9 @@
           v-bind:balls=balls
           v-bind:key=ball.key
           v-for="ball in balls"
-          v-bind:class="{active : ball.sorted, selected : ball.choiced}"
+          v-bind:class="{awarded : ball.awarded, selected : ball.chosen}"
           class="ball"
-          v-on:click="choice(ball)" >
+          v-on:click="choose(ball)" >
           {{ ball.val }}
         </button>
       </div>
@@ -20,16 +20,16 @@
     <!-- Panel.vue -->
     <div class="row">
       <h2>Choiced balls:</h2>
-      <input type="number" v-model.number=choiced.amount v-bind:min=choiced.min  v-bind:max=choiced.max>
-      <div class="choiced balls">
+      <input type="number" v-model.number=chosen.amount v-bind:min=chosen.min  v-bind:max=chosen.max>
+      <div class="chosen balls">
         <button
           v-bind:key=ball.key
-          v-for="ball in choiced.balls"
-          v-bind:class="{active : ball.sorted, selected : ball.choiced}"
+          v-for="ball in chosen.balls"
+          v-bind:class="{awarded : ball.awarded, selected : ball.chosen}"
           class="ball" >
           {{ ball.val }}
         </button>
-        <div class="left"> left: {{choiced.left}}</div>
+        <div class="left"> left: {{chosen.left}}</div>
       </div>
       <input type="button" v-on:click=add() value="add" />
     </div>
@@ -49,7 +49,7 @@
             v-bind:key=ball.key
             v-for="ball in game.balls"
             class="ball"
-            v-bind:class="{active : ball.sorted}"
+            v-bind:class="{awarded : ball.awarded}"
             >
             {{ ball.val }}
           </div>
@@ -73,7 +73,7 @@
 
 <script>
 import {balls} from '../logic/balls.js'
-import {choice, choiced, verify} from '../logic/game.js'
+import {choose, chosen, verify} from '../logic/game.js'
 
 export default {
   name: 'Balls',
@@ -81,47 +81,47 @@ export default {
     return {
       title: 'Game balls',
       balls: balls(60),
-      choiced: choiced,
-      games: [],
-      choiceds: []
+      chosen: chosen,
+      games: []
     }
   },
   methods: {
-    choice(ball) {
+    choose(ball) {
       if (ball.key < 0) {
         return alert(`the key '${ball.key}' is invalid!`)
       }
-      if(this.choiced.balls.length === this.choiced.amount && !ball.choiced) {
+      if(this.chosen.balls.length === this.chosen.amount && !ball.chosen) {
         return alert(
-          `The number of choiced balls is ${this.choiced.amount}. Please, increase the 'amount' or click in 'add' button`
+          `The number of chosen balls is ${this.chosen.amount}. Please, increase the 'amount' or click in 'add' button`
         )
       }
-      ball.choiced = !ball.choiced
-      this.choiced.balls = this.balls.filter(b => b.choiced === true)
-      this.choiced.left = this.choiced.amount - this.choiced.balls.length
+      ball.chosen = !ball.chosen
+      this.chosen.balls = this.balls.filter(b => b.chosen === true)
+      this.chosen.left = this.chosen.amount - this.chosen.balls.length
     },
     add() {
-      if (this.choiced.amount === this.choiced.balls.length) {
+      if (this.chosen.amount === this.chosen.balls.length) {
         this.games.push({
           key: this.games.length,
-          balls: this.choiced.balls.filter(f => f).sort((l, r) => l.val < r.val),
-          hits: this.balls.reduce((r, b) => { if (b.sorted) { return r + 1} else { return 0 } }, 0)
+          balls: this.chosen.balls.filter(f => f).sort((l, r) => l.val < r.val),
+          hits: this.balls.reduce((r, b) => { if (b.awarded) { return r + 1} else { return 0 } }, 0)
         }
         )
         this.balls = this.balls.filter(f => {
-          f.choiced = false
+          f.chosen = false
           return f
         })
-        this.choiced.balls = []
-      } else if (this.choiced.amount > this.choiced.balls.length) {
-        return alert(`Please choice more  ${this.choiced.amount - this.choiced.balls.length} ball(s)`)
-      } else if (this.choiced.amount < this.choiced.balls.length)
-        return alert(`The number of choiced balls is insuficient!`)
+        this.chosen.balls = []
+      } else if (this.chosen.amount > this.chosen.balls.length) {
+        return alert(`Please choose more  ${this.chosen.amount - this.chosen.balls.length} ball(s)`)
+      } else if (this.chosen.amount < this.chosen.balls.length) {
+        return alert(`The number of chosen balls is insuficient!`)
+      }
     },
     verify() {
-      this.balls.filter(b => b.sorted = false)
-      this.choiceds = choice(this.balls, 6)
-      verify(this.choiceds, this.games)
+      this.balls.filter(b => b.awarded = false)
+      choose(this.balls, 6)
+      verify(this.games)
     }
   }
 }
@@ -167,9 +167,9 @@ export default {
     padding: 0 4px;
   }
 }
-.choiced {
+.chosen {
   min-height: 32px;
-  max-width: 360px;
+  max-width: 420px;
   margin: 4px auto;
   border-radius: 16px;
   background-color: lightgray;
@@ -217,7 +217,7 @@ export default {
     padding: 2px;
     margin: 2px;
 
-    &.active {
+    &.awarded {
       font-weight: bold;
       color: white;
       background: green;

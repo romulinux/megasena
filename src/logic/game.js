@@ -7,7 +7,7 @@ const random = function (min, max) {
   return r
 }
 
-export const choiced = {
+export const chosen = {
   amount: 6,
   min: 6,
   max: 12,
@@ -15,35 +15,28 @@ export const choiced = {
   left: 6
 }
 
-export const choice = function (balls, amount = 6) {
+export const choose = function (balls, amount = 6) {
   if (amount > balls.length) {
-    alert(`The '${amount}' is greater than number of balls`)
+    return alert(`The '${amount}' is greater than number of balls`)
   } else {
-    let choiceds = []
     let keys = []
     balls.filter(b => {
       keys.push(b.key)
     })
     for(let i = 0; i < amount; i++) {
-      let key = random(0, keys.length)
-      keys.splice(key, 1)
-      choiceds.push(balls[key])
-      balls.filter(b => {
-        if(b.key == key) {
-          b.sorted = true
+      let index = random(0, keys.length)
+      let key = keys[index]
+      keys.splice(index, 1)
+      for (let j = 0; j < balls.length; j++) {
+        if (balls[j].key === key) {
+          balls[j].awarded = true
+          break
         }
-      })
+      }
     }
-    return choiceds
   }
-  return []
 }
 
-export const verify = function (balls, games) {
-  games.filter(g => {
-    g.hits = g.balls.reduce((r, b) => b.sorted ? r + 1 : r, 0)
-  })
-  return {
-    balls, games
-  }
+export const verify = function (games) {
+  games.filter(g => g.hits = g.balls.reduce((r, b) => b.awarded ? r + 1 : r, 0))
 }
