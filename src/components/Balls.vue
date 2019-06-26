@@ -69,6 +69,7 @@
       <input
         type="button"
         value="verify"
+        class="verify"
         v-on:click="verify()"
       >
     </div>
@@ -138,6 +139,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.verify {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  background: green;
+  color: white;
+  border-radius: 24px;
+  margin: 20px auto;
+}
 .game {
   flex: 1;
   display: flex;
