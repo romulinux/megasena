@@ -3,8 +3,7 @@
 const random = function (min, max) {
   min = Math.ceil(min)
   max = Math.floor(max)
-  const r = Math.floor(Math.random() * (max - min)) + min
-  return r
+  return Math.floor(Math.random() * (max - min)) + min
 }
 
 export const chosen = {
@@ -13,6 +12,26 @@ export const chosen = {
   max: 12,
   balls: [],
   left: 6
+}
+
+export const auto = function (balls, amount = 6) {
+  if (amount > balls.length) {
+    return alert(`The '${amount}' is greater than number of balls`)
+  } else {
+    let keys = []
+    balls.filter(b => {
+      keys.push(b.key)
+    })
+    for (let i = 0; i < amount; i++) {
+      const key = keys.splice(random(0, keys.length), 1)[0]
+      for (let j = 0; j < balls.length; j++) {
+        if (balls[j].key === key) {
+          balls[j].chosen = true
+          break
+        }
+      }
+    }
+  }
 }
 
 export const choose = function (balls, amount = 6) {
@@ -24,9 +43,7 @@ export const choose = function (balls, amount = 6) {
       keys.push(b.key)
     })
     for(let i = 0; i < amount; i++) {
-      let index = random(0, keys.length)
-      let key = keys[index]
-      keys.splice(index, 1)
+      const key = keys.splice(random(0, keys.length), 1)[0]
       for (let j = 0; j < balls.length; j++) {
         if (balls[j].key === key) {
           balls[j].awarded = true

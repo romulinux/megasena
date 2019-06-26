@@ -2,7 +2,7 @@
   <div class="container">
     <!-- Container.vue -->
     <div class="row">
-      <h2>{{ title }}</h2>
+      <h2>balls</h2>
       <div class="balls">
         <button
           v-bind:balls=balls
@@ -10,7 +10,8 @@
           v-for="ball in balls"
           v-bind:class="{awarded : ball.awarded, selected : ball.chosen}"
           class="ball"
-          v-on:click="choose(ball)" >
+          v-on:click="choose(ball)"
+        >
           {{ ball.val }}
         </button>
       </div>
@@ -19,14 +20,17 @@
 
     <!-- Panel.vue -->
     <div class="row">
-      <h2>Choiced balls:</h2>
+      <h2>chosen balls:</h2>
       <input type="number" v-model.number=chosen.amount v-bind:min=chosen.min  v-bind:max=chosen.max>
+      <input type="button" value="auto" v-on:click=auto()>
       <div class="chosen balls">
         <button
           v-bind:key=ball.key
           v-for="ball in chosen.balls"
           v-bind:class="{awarded : ball.awarded, selected : ball.chosen}"
-          class="ball" >
+          class="ball"
+          v-on:click="choose(ball)"
+        >
           {{ ball.val }}
         </button>
         <div class="left"> left: {{chosen.left}}</div>
@@ -37,7 +41,7 @@
 
     <!-- Games.vue -->
     <div class="col">
-      <h2>Games:</h2>
+      <h2>play sets:</h2>
       <div
         v-bind:games=games
         v-bind:key=game.key
@@ -50,7 +54,7 @@
             v-for="ball in game.balls"
             class="ball"
             v-bind:class="{awarded : ball.awarded}"
-            >
+          >
             {{ ball.val }}
           </div>
           <div class="hits">{{ game.hits }}</div>
@@ -73,19 +77,24 @@
 
 <script>
 import {balls} from '../logic/balls.js'
-import {choose, chosen, verify} from '../logic/game.js'
+import {auto, choose, chosen, verify} from '../logic/game.js'
 
 export default {
   name: 'Balls',
   data () {
     return {
-      title: 'Game balls',
       balls: balls(60),
       chosen: chosen,
       games: []
     }
   },
   methods: {
+    auto() {
+      this.balls.filter(f => f.chosen = false)
+      auto(this.balls, this.chosen.amount)
+      this.chosen.balls = this.balls.filter(b => b.chosen === true)
+      this.chosen.left = this.chosen.amount - this.chosen.balls.length
+    },
     choose(ball) {
       if (ball.key < 0) {
         return alert(`the key '${ball.key}' is invalid!`)
@@ -103,19 +112,16 @@ export default {
       if (this.chosen.amount === this.chosen.balls.length) {
         this.games.push({
           key: this.games.length,
-          balls: this.chosen.balls.filter(f => f).sort((l, r) => l.val < r.val),
-          hits: this.balls.reduce((r, b) => { if (b.awarded) { return r + 1} else { return 0 } }, 0)
+          balls: this.chosen.balls.sort((l, r) => l.val < r.val),
+          hits: this.chosen.balls.reduce((r, b) => b.awarded ? r + 1 : r , 0)
         }
         )
-        this.balls = this.balls.filter(f => {
-          f.chosen = false
-          return f
-        })
+        this.balls.filter(f => { f.chosen = false })
         this.chosen.balls = []
       } else if (this.chosen.amount > this.chosen.balls.length) {
-        return alert(`Please choose more  ${this.chosen.amount - this.chosen.balls.length} ball(s)`)
+        return alert(`Please choose more '${this.chosen.amount - this.chosen.balls.length}' ball(s)`)
       } else if (this.chosen.amount < this.chosen.balls.length) {
-        return alert(`The number of chosen balls is insuficient!`)
+        return alert(`The number of chosen balls is too high! Please, remove '${this.chosen.balls.length - this.chosen.amount}' ball(s).`)
       }
     },
     verify() {
